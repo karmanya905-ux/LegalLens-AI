@@ -1,0 +1,145 @@
+
+from typing import TypedDict, Literal
+
+from langgraph.graph import StateGraph, END
+
+from app.services.rag import RAGService
+
+
+class AgentState(TypedDict):
+    document_id: str
+    request: str
+    action: Literal["question", "summary", "risk_review"]
+    result: str
+    sources: list[str]
+
+
+class LegalAgent:
+    """LangGraph-based workflow for legal document analysis."""
+
+    def __init__(self, rag: RAGService):
+        self.rag = rag
+
+        graph = StateGraph(AgentState)
+        graph.add_node("route_request", self.route_request)
+        graph.add_node("answer_question", self.answer_question)
+        graph.add_node("summarize_document", self.summarize_document)
+        graph.add_node("review_risks", self.review_risks)
+
+        graph.set_entry_point("route_request")
+
+        graph.add_conditional_edges(
+            "route_request",
+            self.choose_action,
+            {
+                "question": "answer_question",
+                "summary": "summarize_document",
+                "risk_review": "review_risks",
+            },
+        )
+
+        graph.add_edge("answer_question", END)
+        graph.add_edge("summarize_document", END)
+        graph.add_edge("review_risks", END)
+
+        self.graph = graph.compile()
+
+    def route_request(self, state: AgentState) -> dict:
+        """Select the appropriate workflow for the user's request."""
+        text = state["request"].lower()
+
+        if any(word in text for word in (
+            "risk", "risky", "red flag", "one-sided",
+            "problematic", "potential issue",
+        )):
+            action = "risk_review"
+        elif any(word in text for word in (
+            "summarize", "summary", "overview",
+            "key points", "main points",
+        )):
+            action = "summary"
+        else:
+            action = "question"
+
+        return {"action": action}
+
+    def choose_action(self, state: AgentState) -> str:
+        return state["action"]
+
+    def answer_question(self, state: AgentState) -> dict:
+        response = self.rag.answer(
+            state["document_id"], state["request"]
+        )
+        return {
+            "result": response["answer"],
+            "sources": response.get("sources", []),
+        }
+
+    def summarize_document(self, state: AgentState) -> dict:
+        excerpts = self.rag.retrieve(
+            state["document_id"],
+            "Main purpose, parties, obligations, dates, notice periods, and termination terms",
+            limit=8,
+        )
+
+        if not excerpts:
+            return {
+                "result": "No relevant indexed passages were found.",
+                "sources": [],
+            }
+
+        prompt = (
+            "Summarize this legal document for educational purposes. "
+            "Use only the supplied excerpts. Organize the answer into "
+            "Purpose, Key obligations, Dates and notice periods, and "
+            "Missing or unclear terms. Cite factual claims using the "
+            "provided [Page N] labels. Do not give legal advice.\n\n"
+            + "\n\n".join(excerpts)
+        )
+
+        return {
+            "result": self.rag.generate(prompt),
+            "sources": excerpts,
+        }
+
+    def review_risks(self, state: AgentState) -> dict:
+        excerpts = self.rag.retrieve(
+            state["document_id"],
+            "Potentially risky, unclear, one-sided, or missing contractual terms",
+            limit=10,
+        )
+
+        if not excerpts:
+            return {
+                "result": "No relevant indexed passages were found.",
+                "sources": [],
+            }
+
+        prompt = (
+            "Review these contract excerpts for issues worth examining. "
+            "Do not assert illegality. For each issue explain why it may "
+            "matter, a question to ask, and the supporting page citation. "
+            "Distinguish missing information from actual risks. "
+            "Educational information only, not legal advice.\n\n"
+            + "\n\n".join(excerpts)
+        )
+
+        return {
+            "result": self.rag.generate(prompt),
+            "sources": excerpts,
+        }
+
+    def run(self, document_id: str, request: str) -> dict:
+        state = self.graph.invoke({
+            "document_id": document_id,
+            "request": request,
+            "action": "question",
+            "result": "",
+            "sources": [],
+        })
+
+        return {
+            "action": state["action"],
+            "result": state["result"],
+            "sources": state["sources"],
+        }

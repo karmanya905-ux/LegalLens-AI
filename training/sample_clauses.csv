@@ -1,0 +1,7 @@
+text,label,source_id
+"Either party may terminate this agreement by providing thirty days written notice.",termination,demo-contract-1
+"The employee shall keep all confidential information secret during and after employment.",confidentiality,demo-contract-1
+"The employee will receive a monthly salary of INR 45000.",compensation,demo-contract-1
+"Annual leave entitlement shall be twelve working days per year.",leave_benefits,demo-contract-2
+"Any dispute shall be subject to the exclusive jurisdiction of the courts in Delhi.",dispute_resolution,demo-contract-2
+"The employee shall indemnify the company against losses caused by a breach of this agreement.",liability_indemnity,demo-contract-3

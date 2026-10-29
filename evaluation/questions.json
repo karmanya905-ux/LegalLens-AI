@@ -1,0 +1,26 @@
+[
+  {
+    "question": "What is the monthly salary?",
+    "expected": "Cite the salary clause and page, or say not specified."
+  },
+  {
+    "question": "What is the notice period?",
+    "expected": "Cite the notice period and page, or say not specified."
+  },
+  {
+    "question": "How long is the probation period?",
+    "expected": "Cite the probation clause and page, or say not specified."
+  },
+  {
+    "question": "What is the annual leave entitlement?",
+    "expected": "Cite the leave clause and page, or say not specified."
+  },
+  {
+    "question": "Which law governs the agreement?",
+    "expected": "Cite the governing-law clause and page, or say not specified."
+  },
+  {
+    "question": "How long does confidentiality continue after employment?",
+    "expected": "Cite the duration and page, or say not specified."
+  }
+]
