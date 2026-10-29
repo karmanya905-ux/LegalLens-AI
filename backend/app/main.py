@@ -4,6 +4,10 @@ import os
 import uuid
 from pathlib import Path
 from typing import Any
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from dotenv import load_dotenv
@@ -65,29 +69,85 @@ def list_documents():
 
 @app.post("/documents/upload")
 async def upload_pdf(file: UploadFile = File(...)):
+    start = time.perf_counter()
+
+    def log_step(message: str):
+        logger.warning(
+            "[UPLOAD] %s | elapsed=%.2fs",
+            message,
+            time.perf_counter() - start,
+        )
+
+    log_step("Request received")
+
     if not file.filename or Path(file.filename).suffix.lower() != ".pdf":
-        raise HTTPException(status_code=400, detail="Please upload a PDF file.")
+        raise HTTPException(
+            status_code=400,
+            detail="Please upload a PDF file."
+        )
+
     content = await file.read()
+    log_step(f"File read: {len(content)} bytes")
+
     if not content:
-        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file is empty."
+        )
+
     if len(content) > 25 * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="PDF exceeds 25 MB limit.")
+        raise HTTPException(
+            status_code=413,
+            detail="PDF exceeds 25 MB limit."
+        )
+
     document_id = str(uuid.uuid4())
     safe_name = Path(file.filename).name.replace("\x00", "")
     destination = UPLOAD_DIR / f"{document_id}.pdf"
     destination.write_bytes(content)
+
+    log_step("PDF saved")
+
     try:
         pages = extract_pdf_pages(destination)
+        log_step(f"PDF extracted: {len(pages)} pages")
+
         if not any(p["text"].strip() for p in pages):
-            raise ValueError("No extractable text found. Scanned PDFs need OCR.")
+            raise ValueError(
+                "No extractable text found. Scanned PDFs need OCR."
+            )
+
         chunks = chunk_pages(pages)
+        log_step(f"Chunks created: {len(chunks)}")
+
         rag.index_document(document_id, safe_name, chunks)
-        store.add_document(document_id, safe_name, str(destination), len(pages), len(chunks))
+        log_step("Qdrant indexing completed")
+
+        store.add_document(
+            document_id,
+            safe_name,
+            str(destination),
+            len(pages),
+            len(chunks),
+        )
+        log_step("Metadata saved")
+
     except Exception as exc:
+        logger.exception("[UPLOAD] PDF processing failed")
         destination.unlink(missing_ok=True)
-        raise HTTPException(status_code=422, detail=f"Could not process PDF: {exc}") from exc
-    return {"document_id": document_id, "filename": safe_name,
-            "pages": len(pages), "chunks": len(chunks), "status": "processed"}
+
+        raise HTTPException(
+            status_code=422,
+            detail=f"Could not process PDF: {exc}",
+        ) from exc
+
+    return {
+        "document_id": document_id,
+        "filename": safe_name,
+        "pages": len(pages),
+        "chunks": len(chunks),
+        "status": "processed",
+    }
 
 
 @app.post("/chat")
