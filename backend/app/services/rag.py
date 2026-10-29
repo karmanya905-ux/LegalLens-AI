@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from qdrant_client import QdrantClient, models
-from sentence_transformers import SentenceTransformer
+
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 
@@ -21,7 +21,12 @@ class RAGService:
 
     def _load_embedder(self):
         if self.embedder is None:
-            self.embedder = SentenceTransformer(self.embedding_model_name, device="cpu")
+            from sentence_transformers import SentenceTransformer
+
+            self.embedder = SentenceTransformer(
+                self.embedding_model_name,
+                device="cpu"
+            )
         return self.embedder
 
     def _ensure_collection(self):
