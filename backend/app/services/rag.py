@@ -46,13 +46,24 @@ class RAGService:
     def _ensure_collection(self):
         if self._collection_ready:
             return
-        dim = self._load_embedder().get_sentence_embedding_dimension()
+
+        dim = 384
+
+        logger.warning("[RAG] Checking Qdrant collection")
+
         if not self.client.collection_exists(self.collection):
+            logger.warning("[RAG] Creating Qdrant collection")
+
             self.client.create_collection(
                 collection_name=self.collection,
-                vectors_config=models.VectorParams(size=dim, distance=models.Distance.COSINE)
+                vectors_config=models.VectorParams(
+                    size=dim,
+                    distance=models.Distance.COSINE
+                )
             )
+
         self._collection_ready = True
+        logger.warning("[RAG] Collection ready")
 
     def index_document(self, document_id: str, filename: str, chunks: list[dict]):
         start = time.perf_counter()
