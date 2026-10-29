@@ -14,3 +14,4 @@ scikit-learn
 joblib
 numpy<2.3
 SQLAlchemy
+huggingface_hub

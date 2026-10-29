@@ -2,6 +2,8 @@ import os
 import uuid
 import logging
 import time
+from huggingface_hub import InferenceClient
+from sklearn.feature_extraction.text import HashingVectorizer
 
 logger = logging.getLogger(__name__)
 
@@ -20,28 +22,33 @@ class RAGService:
         self.qdrant_path = Path(os.getenv("QDRANT_PATH", "./data/qdrant"))
         self.qdrant_path.mkdir(parents=True, exist_ok=True)
         self.client = QdrantClient(path=str(self.qdrant_path))
-        self.collection = "legal_chunks"
+        self.collection = "legal_chunks_v2"
         self.embedder = None
         self._collection_ready = False
 
     def _load_embedder(self):
         if self.embedder is None:
-            from sentence_transformers import SentenceTransformer
+            token = os.getenv("HF_TOKEN", "").strip()
 
-            start = time.perf_counter()
-            logger.warning("[RAG] Starting embedding model load")
+            if not token:
+                raise RuntimeError("HF_TOKEN is missing.")
 
-            self.embedder = SentenceTransformer(
-                self.embedding_model_name,
-                device="cpu"
-            )
-
-            logger.warning(
-                "[RAG] Embedding model loaded in %.2fs",
-                time.perf_counter() - start
+            self.embedder = InferenceClient(
+                provider="hf-inference",
+                api_key=token,
             )
 
         return self.embedder
+    def _encode(self, texts: list[str]) -> list[list[float]]:
+        vectorizer = HashingVectorizer(
+            n_features=384,
+            alternate_sign=False,
+            norm="l2",
+            ngram_range=(1, 2),
+        )
+
+        vectors = vectorizer.transform(texts).toarray()
+        return vectors.tolist()
 
     def _ensure_collection(self):
         if self._collection_ready:
@@ -79,10 +86,7 @@ class RAGService:
             len(texts)
         )
 
-        vectors = self._load_embedder().encode(
-            texts,
-            normalize_embeddings=True
-        ).tolist()
+        vectors = self._encode(texts)
 
         logger.warning(
             "[RAG] Embeddings generated in %.2fs",
@@ -130,7 +134,7 @@ class RAGService:
 
     def retrieve(self, document_id: str, query: str, limit: int = 5) -> list[str]:
         self._ensure_collection()
-        vector = self._load_embedder().encode(query, normalize_embeddings=True).tolist()
+        vector = self._encode([query])[0]
         hits = self.client.query_points(
             collection_name=self.collection, query=vector, limit=limit,
             query_filter=models.Filter(must=[models.FieldCondition(
