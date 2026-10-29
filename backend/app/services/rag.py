@@ -1,5 +1,10 @@
 import os
 import uuid
+import logging
+import time
+
+logger = logging.getLogger(__name__)
+
 from pathlib import Path
 from typing import Optional
 
@@ -23,10 +28,19 @@ class RAGService:
         if self.embedder is None:
             from sentence_transformers import SentenceTransformer
 
+            start = time.perf_counter()
+            logger.warning("[RAG] Starting embedding model load")
+
             self.embedder = SentenceTransformer(
                 self.embedding_model_name,
                 device="cpu"
             )
+
+            logger.warning(
+                "[RAG] Embedding model loaded in %.2fs",
+                time.perf_counter() - start
+            )
+
         return self.embedder
 
     def _ensure_collection(self):
@@ -41,19 +55,67 @@ class RAGService:
         self._collection_ready = True
 
     def index_document(self, document_id: str, filename: str, chunks: list[dict]):
+        start = time.perf_counter()
+
+        logger.warning("[RAG] Starting document indexing")
+
         self._ensure_collection()
+        logger.warning("[RAG] Qdrant collection ready")
+
         texts = [c["text"] for c in chunks]
-        vectors = self._load_embedder().encode(texts, normalize_embeddings=True).tolist()
+        logger.warning(
+            "[RAG] Generating embeddings for %d chunks",
+            len(texts)
+        )
+
+        vectors = self._load_embedder().encode(
+            texts,
+            normalize_embeddings=True
+        ).tolist()
+
+        logger.warning(
+            "[RAG] Embeddings generated in %.2fs",
+            time.perf_counter() - start
+        )
+
         points = []
+
         for idx, (chunk, vector) in enumerate(zip(chunks, vectors)):
-            points.append(models.PointStruct(
-                id=str(uuid.uuid5(uuid.NAMESPACE_URL, f"{document_id}:{idx}")),
-                vector=vector,
-                payload={"document_id": document_id, "filename": filename,
-                         "page": int(chunk["page"]), "text": chunk["text"], "chunk_index": idx}
-            ))
+            points.append(
+                models.PointStruct(
+                    id=str(
+                        uuid.uuid5(
+                            uuid.NAMESPACE_URL,
+                            f"{document_id}:{idx}"
+                        )
+                    ),
+                    vector=vector,
+                    payload={
+                        "document_id": document_id,
+                        "filename": filename,
+                        "page": int(chunk["page"]),
+                        "text": chunk["text"],
+                        "chunk_index": idx,
+                    }
+                )
+            )
+
+        logger.warning(
+            "[RAG] Prepared %d Qdrant points",
+            len(points)
+        )
+
         if points:
-            self.client.upsert(collection_name=self.collection, points=points, wait=True)
+            self.client.upsert(
+                collection_name=self.collection,
+                points=points,
+                wait=True
+            )
+
+        logger.warning(
+            "[RAG] Indexing completed in %.2fs",
+            time.perf_counter() - start
+        )
 
     def retrieve(self, document_id: str, query: str, limit: int = 5) -> list[str]:
         self._ensure_collection()
