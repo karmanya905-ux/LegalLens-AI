@@ -1,0 +1,301 @@
+{
+  "model": "TF-IDF + LinearSVC",
+  "dataset": "LEDGAR filtered single-label subset",
+  "train_rows": 41115,
+  "validation_rows": 6855,
+  "test_rows": 6859,
+  "classes": [
+    "Amendments",
+    "Assignments",
+    "Authority",
+    "Authorizations",
+    "Base Salary",
+    "Binding Effects",
+    "Closings",
+    "Compliance With Laws",
+    "Confidentiality",
+    "Counterparts",
+    "Definitions",
+    "Disclosures",
+    "Entire Agreements",
+    "Expenses",
+    "Fees",
+    "Financial Statements",
+    "Further Assurances",
+    "General",
+    "Governing Laws",
+    "Headings",
+    "Indemnifications",
+    "Insurances",
+    "Litigations",
+    "No Conflicts",
+    "Notices",
+    "Payments",
+    "Releases",
+    "Remedies",
+    "Representations",
+    "Severability",
+    "Subsidiaries",
+    "Survival",
+    "Taxes",
+    "Terminations",
+    "Terms",
+    "Use Of Proceeds",
+    "Waiver Of Jury Trials",
+    "Waivers",
+    "Withholdings"
+  ],
+  "validation_accuracy": 0.9461706783369803,
+  "validation_macro_f1": 0.9318806103958374,
+  "test_accuracy": 0.9448899256451377,
+  "test_macro_f1": 0.9283998204019943,
+  "test_classification_report": {
+    "Amendments": {
+      "precision": 0.9217391304347826,
+      "recall": 0.9464285714285714,
+      "f1-score": 0.933920704845815,
+      "support": 224.0
+    },
+    "Assignments": {
+      "precision": 0.9518716577540107,
+      "recall": 0.9128205128205128,
+      "f1-score": 0.9319371727748691,
+      "support": 195.0
+    },
+    "Authority": {
+      "precision": 0.6666666666666666,
+      "recall": 0.7419354838709677,
+      "f1-score": 0.7022900763358778,
+      "support": 62.0
+    },
+    "Authorizations": {
+      "precision": 0.9315068493150684,
+      "recall": 0.7555555555555555,
+      "f1-score": 0.8343558282208589,
+      "support": 90.0
+    },
+    "Base Salary": {
+      "precision": 0.9821428571428571,
+      "recall": 0.9821428571428571,
+      "f1-score": 0.9821428571428571,
+      "support": 112.0
+    },
+    "Binding Effects": {
+      "precision": 0.8888888888888888,
+      "recall": 0.8888888888888888,
+      "f1-score": 0.8888888888888888,
+      "support": 126.0
+    },
+    "Closings": {
+      "precision": 0.9846153846153847,
+      "recall": 1.0,
+      "f1-score": 0.9922480620155039,
+      "support": 64.0
+    },
+    "Compliance With Laws": {
+      "precision": 0.95260663507109,
+      "recall": 0.9663461538461539,
+      "f1-score": 0.9594272076372315,
+      "support": 208.0
+    },
+    "Confidentiality": {
+      "precision": 0.907608695652174,
+      "recall": 1.0,
+      "f1-score": 0.9515669515669516,
+      "support": 167.0
+    },
+    "Counterparts": {
+      "precision": 0.9979591836734694,
+      "recall": 0.9979591836734694,
+      "f1-score": 0.9979591836734694,
+      "support": 490.0
+    },
+    "Definitions": {
+      "precision": 0.9739130434782609,
+      "recall": 0.9411764705882353,
+      "f1-score": 0.9572649572649573,
+      "support": 119.0
+    },
+    "Disclosures": {
+      "precision": 0.9565217391304348,
+      "recall": 0.9072164948453608,
+      "f1-score": 0.9312169312169312,
+      "support": 97.0
+    },
+    "Entire Agreements": {
+      "precision": 0.9788359788359788,
+      "recall": 0.9840425531914894,
+      "f1-score": 0.9814323607427056,
+      "support": 376.0
+    },
+    "Expenses": {
+      "precision": 0.9057591623036649,
+      "recall": 0.9453551912568307,
+      "f1-score": 0.9251336898395722,
+      "support": 183.0
+    },
+    "Fees": {
+      "precision": 0.9047619047619048,
+      "recall": 0.8539325842696629,
+      "f1-score": 0.8786127167630058,
+      "support": 89.0
+    },
+    "Financial Statements": {
+      "precision": 0.975609756097561,
+      "recall": 0.975609756097561,
+      "f1-score": 0.975609756097561,
+      "support": 82.0
+    },
+    "Further Assurances": {
+      "precision": 0.9735099337748344,
+      "recall": 0.9671052631578947,
+      "f1-score": 0.9702970297029703,
+      "support": 152.0
+    },
+    "General": {
+      "precision": 0.8263473053892215,
+      "recall": 0.6798029556650246,
+      "f1-score": 0.745945945945946,
+      "support": 203.0
+    },
+    "Governing Laws": {
+      "precision": 0.988013698630137,
+      "recall": 0.9914089347079038,
+      "f1-score": 0.9897084048027445,
+      "support": 582.0
+    },
+    "Headings": {
+      "precision": 0.9865470852017937,
+      "recall": 1.0,
+      "f1-score": 0.9932279909706546,
+      "support": 220.0
+    },
+    "Indemnifications": {
+      "precision": 0.9551282051282052,
+      "recall": 0.9802631578947368,
+      "f1-score": 0.9675324675324676,
+      "support": 152.0
+    },
+    "Insurances": {
+      "precision": 0.9416058394160584,
+      "recall": 0.9699248120300752,
+      "f1-score": 0.9555555555555556,
+      "support": 133.0
+    },
+    "Litigations": {
+      "precision": 0.984375,
+      "recall": 0.9767441860465116,
+      "f1-score": 0.980544747081712,
+      "support": 129.0
+    },
+    "No Conflicts": {
+      "precision": 0.9333333333333333,
+      "recall": 0.9423076923076923,
+      "f1-score": 0.937799043062201,
+      "support": 104.0
+    },
+    "Notices": {
+      "precision": 0.9762470308788599,
+      "recall": 0.9739336492890995,
+      "f1-score": 0.9750889679715302,
+      "support": 422.0
+    },
+    "Payments": {
+      "precision": 0.7777777777777778,
+      "recall": 0.8888888888888888,
+      "f1-score": 0.8296296296296296,
+      "support": 126.0
+    },
+    "Releases": {
+      "precision": 0.859375,
+      "recall": 0.9166666666666666,
+      "f1-score": 0.8870967741935484,
+      "support": 60.0
+    },
+    "Remedies": {
+      "precision": 0.9576271186440678,
+      "recall": 0.9576271186440678,
+      "f1-score": 0.9576271186440678,
+      "support": 118.0
+    },
+    "Representations": {
+      "precision": 0.8404255319148937,
+      "recall": 0.8404255319148937,
+      "f1-score": 0.8404255319148937,
+      "support": 94.0
+    },
+    "Severability": {
+      "precision": 0.9854721549636803,
+      "recall": 0.9878640776699029,
+      "f1-score": 0.9866666666666667,
+      "support": 412.0
+    },
+    "Subsidiaries": {
+      "precision": 0.9841269841269841,
+      "recall": 0.9841269841269841,
+      "f1-score": 0.9841269841269841,
+      "support": 63.0
+    },
+    "Survival": {
+      "precision": 0.972972972972973,
+      "recall": 0.972972972972973,
+      "f1-score": 0.972972972972973,
+      "support": 222.0
+    },
+    "Taxes": {
+      "precision": 0.898876404494382,
+      "recall": 0.8648648648648649,
+      "f1-score": 0.8815426997245179,
+      "support": 185.0
+    },
+    "Terminations": {
+      "precision": 0.8660714285714286,
+      "recall": 0.8220338983050848,
+      "f1-score": 0.8434782608695652,
+      "support": 118.0
+    },
+    "Terms": {
+      "precision": 0.9166666666666666,
+      "recall": 0.875,
+      "f1-score": 0.8953488372093024,
+      "support": 176.0
+    },
+    "Use Of Proceeds": {
+      "precision": 0.9672131147540983,
+      "recall": 0.9833333333333333,
+      "f1-score": 0.9752066115702479,
+      "support": 120.0
+    },
+    "Waiver Of Jury Trials": {
+      "precision": 0.9734513274336283,
+      "recall": 0.990990990990991,
+      "f1-score": 0.9821428571428571,
+      "support": 111.0
+    },
+    "Waivers": {
+      "precision": 0.9329268292682927,
+      "recall": 0.9216867469879518,
+      "f1-score": 0.9272727272727272,
+      "support": 166.0
+    },
+    "Withholdings": {
+      "precision": 0.8455284552845529,
+      "recall": 0.9719626168224299,
+      "f1-score": 0.9043478260869565,
+      "support": 107.0
+    },
+    "accuracy": 0.9448899256451377,
+    "macro avg": {
+      "precision": 0.9288365828832835,
+      "recall": 0.9297268102760023,
+      "f1-score": 0.9283998204019943,
+      "support": 6859.0
+    },
+    "weighted avg": {
+      "precision": 0.9451905119022636,
+      "recall": 0.9448899256451377,
+      "f1-score": 0.9443923446501322,
+      "support": 6859.0
+    }
+  }
+}

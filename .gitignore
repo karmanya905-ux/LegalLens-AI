@@ -7,7 +7,10 @@ __pycache__/
 node_modules/
 dist/
 backend/data/
-training/output/
+training/output/*
+!training/output/ledgar_tfidf/
+!training/output/ledgar_tfidf/classifier.joblib
+!training/output/ledgar_tfidf/metrics.json
 training/*.safetensors
 training/*.bin
 training/checkpoint-*/
